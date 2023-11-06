@@ -14,31 +14,28 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity
-{
-    private TextView tvage , tvresultat;
-    private SeekBar sbage ;
-    private RadioButton rboui ;
-    private RadioButton rbnon ;
+public class MainActivity extends AppCompatActivity {
+    private TextView tvage, tvresultat;
+    private SeekBar sbage;
+    private RadioButton rboui;
+    private RadioButton rbnon;
 
     private EditText etvaleur;
 
-    private Button btnConsulter ;
+    private Button btnConsulter;
 
-    private void init()
-    {
+    private void init() {
         etvaleur = (EditText) findViewById(R.id.etValeur);
         sbage = (SeekBar) findViewById(R.id.sbAge);
-        tvage = (TextView)findViewById(R.id.tvAge);
+        tvage = (TextView) findViewById(R.id.tvAge);
         rboui = (RadioButton) findViewById(R.id.rbIsFasting);
         rbnon = (RadioButton) findViewById(R.id.rbIsNotFasting);
-        btnConsulter=(Button) findViewById(R.id.btnConsulter);
+        btnConsulter = (Button) findViewById(R.id.btnConsulter);
         tvresultat = (TextView) findViewById(R.id.tvResult);
     }
 
 
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
@@ -59,49 +56,50 @@ public class MainActivity extends AppCompatActivity
 
         btnConsulter.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 calculer(v);
             }
 
-            private void calculer(View v)
-            {
-                String contenuTexte = etvaleur.getText().toString();
-                double niveauGlycemie = Double.parseDouble(contenuTexte);
-                boolean estAJean = rboui.isChecked();
-                String message;
-
-                if (estAJean)
-                {
-                    if (niveauGlycemie >= 5.0 && niveauGlycemie <= 7.2)
-                    {
-                        message = "Le niveau de glycémie est normal avant le repas ou à jeun.";
-                    }
-                    else if (niveauGlycemie < 5.0)
-                    {
-                        message = "Le niveau de glycémie est trop bas avant le repas ou à jeun.";
-                    }
-                    else
-                    {
-                        message = "Le niveau de glycémie est trop élevé avant le repas ou à jeun.";
-                    }
-                }
+            private void calculer(View v) {
+                int age;
+                float valeur;
+                boolean verifage = false, verifvaleur = false;
+                if (sbage.getProgress() != 0)
+                    verifage = true;
                 else
-                {
-                    if (niveauGlycemie < 10.5)
-                    {
-                        message = "Le niveau de glycémie est normal après le repas.";
-                    }
-                    else
-                    {
-                        message = "Le niveau de glycémie est trop élevé après le repas.";
-                    }
+                    Toast.makeText(MainActivity.this, "veillez verifier votre age", Toast.LENGTH_SHORT).show();
+                if (!etvaleur.getText().toString().isEmpty())
+                    verifvaleur = true;
+                else
+                    Toast.makeText(MainActivity.this, "veillez verifier votre valeur mesurée", Toast.LENGTH_LONG).show();
+                if (verifage && verifvaleur) {
+                    age = sbage.getProgress();
+                    valeur = Float.valueOf(etvaleur.getText().toString());
+                    if (rboui.isChecked())
+                        if (age >= 13)
+                            if (valeur < 5.0)
+                                tvresultat.setText("niveau de glycemie est bas ");
+                            else if (valeur >= 50 && valeur <= 7.2)
+                                tvresultat.setText("niveau de glycemie est normal");
+                            else tvresultat.setText("niveau de glycemie est eleve");
+                        else if (age >= 6 && age <= 12)
+                            if (valeur < 5.0)
+                                tvresultat.setText("niveau de glycemie est bas ");
+                            else if (valeur > 5.0 && valeur <= 10.0)
+                                tvresultat.setText("niveau de glycemie est normal");
+                            else tvresultat.setText("niveau de glycemie est eleve ");
+                        else if (valeur < 5.5) tvresultat.setText("niveau de glycemie est bas");
+                        else if (valeur >= 5.5 && valeur <= 10.0)
+                            tvresultat.setText("niveau de glycemie est normal");
+                        else tvresultat.setText("niveau de glycemie est eleve ");
+                    else if (valeur < 10.5) tvresultat.setText("niveau de glycemie est normal");
+                    else tvresultat.setText("niveau de glycemie est eleve");
+
                 }
 
-                tvresultat.setText(message);
+
             }
         });
-
 
     }
 }
